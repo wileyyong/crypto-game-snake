@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 body {
-  background: white;
+  background: rgb(247, 203, 203);
   font-family: 'Press Start 2P', cursive;
 }
 .playArea {
@@ -32,6 +32,7 @@ body {
   font-size: 35px;
 }
 .playButton {
+  cursor: pointer;
   position: fixed;
   top: 80%;
   left: 50%;
@@ -51,7 +52,7 @@ body {
 .scoreBox {
   float: right;
   margin: 30px;
-  margin-top: 50px;
+  margin-top: 90px;
   --webkit-box-shadow: 0px 4px 13px 0px rgba(48, 26, 74, 0.63);
   box-shadow: 0px 4px 13px 0px rgba(48, 26, 74, 0.63);
 }

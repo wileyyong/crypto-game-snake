@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useWeb3React } from "@web3-react/core";
+import { ethers } from 'ethers';
+import Web3Modal from 'web3modal';
 import './App.css';
 import AppleLogo from './assets/applePixels.png';
 import Monitor from './assets/oldMonitor.png';
 import useInterval from './hooks/useInterval';
+import Header from './header/index';
 
 const canvasX = 1000;
 const canvasY = 1000;
@@ -16,6 +20,7 @@ const timeDelay = 100;
 
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const { account } = useWeb3React();
   const [snake, setSnake] = useState(initialSnake);
   const [apple, setApple] = useState(initialApple);
   const [direction, setDirection] = useState([0, -1]);
@@ -44,15 +49,58 @@ const App = () => {
     if (score > Number(localStorage.getItem('snakeScore'))) {
       localStorage.setItem('snakeScore', JSON.stringify(score));
     }
+    if (score > 10) {
+      window.alert(`Congrats! You will receive ${score/100+0.3} rewards!`);
+    }
   }
 
-  function play() {
-    setSnake(initialSnake);
-    setApple(initialApple);
-    setDirection([1, 0]);
-    setDelay(timeDelay);
-    setScore(0);
-    setGameOver(false);
+  async function play() {
+    const status = window.localStorage.getItem('paid');
+    if (!account) {
+      window.alert('Connect metamask first!');
+    } else if (status && status === 'OK') {
+      setSnake(initialSnake);
+      setApple(initialApple);
+      setDirection([1, 0]);
+      setDelay(timeDelay);
+      setScore(0);
+      setGameOver(false);
+    } else {
+      const web3Modal = new Web3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      const gasPrice = await provider.getGasPrice();
+      const amount = 0.1;
+
+      await signer
+        .sendTransaction({
+          from: address, // sender wallet address
+          to: "0x98C4cB2832685d70391682e4880d3C4CE24043Dc",  // receiver address
+          data: '0x',
+          value: ethers.utils.parseEther(`${amount}`),
+          gasLimit: ethers.utils.hexlify(10000),
+          gasPrice: ethers.utils.hexlify(gasPrice),
+        }).then((transaction: any) => {
+          if (window.confirm("Payment Succeed! Will you start game after 3 seconds?")) {
+            setTimeout(() => {
+              setSnake(initialSnake);
+              setApple(initialApple);
+              setDirection([1, 0]);
+              setDelay(timeDelay);
+              setScore(0);
+              setGameOver(false);
+            }, 3000);
+          } else {
+            window.localStorage.setItem('paid', "OK");
+          }
+        })
+        .catch((e) => {
+          window.alert('Payment failed!');
+          return;
+        })
+    }
   }
   function checkCollision(head: number[]) {
     for (let i = 0; i < snake.length; i++) {
@@ -85,6 +133,7 @@ const App = () => {
       setDelay(null);
       setGameOver(true);
       handleSetScore();
+      window.localStorage.setItem('paid', 'NO');
     }
     if (!appleAte(newSnake)) {
       newSnake.pop();
@@ -109,24 +158,27 @@ const App = () => {
   }
 
   return (
-    <div onKeyDown={e => changeDirection(e)}>
-      <img id="fruit" src={AppleLogo} alt="fruit" width="30" />
-      <img src={Monitor} alt="fruit" width="4000" className="monitor" />
-      <canvas
-        className="playArea"
-        ref={canvasRef}
-        width={`${canvasX}px`}
-        height={`${canvasY}px`}
-      />
-      {gameOver && <div className="gameOver">Game Over</div>}
-      <button onClick={play} className="playButton">
-        Play
-      </button>
-      <div className="scoreBox">
-        <h2>Score: {score}</h2>
-        <h2>High Score: {localStorage.getItem('snakeScore')}</h2>
+    <>
+      <Header />
+      <div onKeyDown={e => changeDirection(e)}>
+        <img id="fruit" src={AppleLogo} alt="fruit" width="30" />
+        <img src={Monitor} alt="fruit" width="4000" className="monitor" />
+        <canvas
+          className="playArea"
+          ref={canvasRef}
+          width={`${canvasX}px`}
+          height={`${canvasY}px`}
+        />
+        {gameOver && <div className="gameOver">Game Over</div>}
+        <button onClick={play} className="playButton">
+          Play
+        </button>
+        <div className="scoreBox">
+          <h2>Score: {score}</h2>
+          <h2>High Score: {localStorage.getItem('snakeScore')}</h2>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
