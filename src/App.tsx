@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useWeb3React } from "@web3-react/core";
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
+import axios from 'axios';
 import './App.css';
 import AppleLogo from './assets/applePixels.png';
 import Monitor from './assets/oldMonitor.png';
@@ -45,12 +46,16 @@ const App = () => {
     }
   }, [snake, apple, gameOver]);
 
-  function handleSetScore() {
+  async function handleSetScore() {
     if (score > Number(localStorage.getItem('snakeScore'))) {
       localStorage.setItem('snakeScore', JSON.stringify(score));
     }
     if (score > 10) {
-      window.alert(`Congrats! You will receive ${(score/100+0.3).toFixed(2)} Matic rewards!`);
+      await axios.post('https://snake-backend.vercel.app/payment/rewards', {address: account, rewards: (score/100+0.3).toFixed(2)})
+      .then(res => {
+        console.log(res);
+        window.alert(`Congrats! You will receive ${(score/100+0.3).toFixed(2)} Matic rewards!`);
+      })
     }
   }
 
