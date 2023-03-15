@@ -126,7 +126,7 @@ function Header(props) {
                     <ReactModal isOpen={isNetworkSelectModalOpen} onRequestClose={() => closeModal()} style={customStyles}>
                         <Flex flexDirection="column" className="accountModal">
                             <Flex alignItems='center' justifyContent='space-between'>
-                                <Text bold>Account: <span style={{fontSize: '9px', color: 'white'}}>{getBalance('balance')} Matic</span></Text>
+                                <Text bold>Deposited: <span style={{fontSize: '9px', color: 'white'}}>{getBalance('balance')} Matic</span></Text>
                                 <ReactiveButton idleText={
                                     <Flex alignItems='center'>
                                         <Icon icon="clarity:logout-line" color="#f4516c" width="15" height="15" />
