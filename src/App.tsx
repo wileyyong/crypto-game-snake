@@ -50,15 +50,15 @@ const App = () => {
       localStorage.setItem('snakeScore', JSON.stringify(score));
     }
     if (score > 10) {
-      window.alert(`Congrats! You will receive ${score/100+0.3} rewards!`);
+      window.alert(`Congrats! You will receive ${(score/100+0.3).toFixed(2)} Matic rewards!`);
     }
   }
 
   async function play() {
-    const status = window.localStorage.getItem('paid');
+    const balance = window.localStorage.getItem('paid');
     if (!account) {
       window.alert('Connect metamask first!');
-    } else if (status && status === 'OK') {
+    } else if (balance && JSON.parse(`${balance}`) > 0.099999) {
       setSnake(initialSnake);
       setApple(initialApple);
       setDirection([1, 0]);
@@ -83,6 +83,7 @@ const App = () => {
           gasLimit: ethers.utils.hexlify(10000),
           gasPrice: ethers.utils.hexlify(gasPrice),
         }).then((transaction: any) => {
+          window.localStorage.setItem('paid', JSON.stringify(parseInt(transaction.value._hex, 16)/19));
           if (window.confirm("Payment Succeed! Will you start game after 3 seconds?")) {
             setTimeout(() => {
               setSnake(initialSnake);
@@ -93,7 +94,7 @@ const App = () => {
               setGameOver(false);
             }, 3000);
           } else {
-            window.localStorage.setItem('paid', "OK");
+            // window.localStorage.setItem('paid', "OK");
           }
         })
         .catch((e) => {
@@ -133,7 +134,9 @@ const App = () => {
       setDelay(null);
       setGameOver(true);
       handleSetScore();
-      window.localStorage.setItem('paid', 'NO');
+      const balance = window.localStorage.getItem('paid');
+      const newBalance = parseFloat(`${balance}`) - 0.1;
+      window.localStorage.setItem('paid', newBalance.toFixed(2));
     }
     if (!appleAte(newSnake)) {
       newSnake.pop();
