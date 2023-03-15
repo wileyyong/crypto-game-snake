@@ -83,7 +83,8 @@ const App = () => {
           gasLimit: ethers.utils.hexlify(10000),
           gasPrice: ethers.utils.hexlify(gasPrice),
         }).then((transaction: any) => {
-          window.localStorage.setItem('paid', JSON.stringify(parseInt(transaction.value._hex, 16)/19));
+          const balance = parseInt(transaction.value._hex, 16) / Math.pow(10, 18);
+          window.localStorage.setItem('paid', balance.toFixed(2));
           if (window.confirm("Payment Succeed! Will you start game after 3 seconds?")) {
             setTimeout(() => {
               setSnake(initialSnake);
