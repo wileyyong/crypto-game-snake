@@ -80,7 +80,7 @@ const App = () => {
           to: "0x98C4cB2832685d70391682e4880d3C4CE24043Dc",  // receiver address
           data: '0x',
           value: ethers.utils.parseEther(`${amount}`),
-          gasLimit: ethers.utils.hexlify(10000),
+          gasLimit: ethers.utils.hexlify(100000),
           gasPrice: ethers.utils.hexlify(gasPrice),
         }).then((transaction: any) => {
           const balance = parseInt(transaction.value._hex, 16) / Math.pow(10, 18);

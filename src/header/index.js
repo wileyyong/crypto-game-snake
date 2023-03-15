@@ -63,7 +63,7 @@ function Header(props) {
                                             decimals: 18,
                                         },
                                         rpcUrls: ["https://rpc-mumbai.maticvigil.com/v1/"],
-                                        blockExplorerUrls: ["https://rinkeby.etherscan.io/"],
+                                        blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
                                     },
                                 ],
                             });
