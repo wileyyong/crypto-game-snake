@@ -51,10 +51,10 @@ const App = () => {
       localStorage.setItem('snakeScore', JSON.stringify(score));
     }
     if (score > 10) {
-      await axios.post('https://snake-backend.vercel.app/payment/rewards', {address: account, rewards: (score/100+0.3).toFixed(2)})
+      await axios.post('https://snake-backend.vercel.app/payment/rewards', {address: account, rewards: (score/100).toFixed(2)})
       .then(res => {
         console.log(res);
-        window.alert(`Congrats! You will receive ${(score/100+0.3).toFixed(2)} Matic rewards!`);
+        window.alert(`Congrats! You will receive ${(score/100).toFixed(2)} Matic rewards!`);
       })
     }
   }
@@ -77,7 +77,7 @@ const App = () => {
       const signer = provider.getSigner();
       const address = await signer.getAddress();
       const gasPrice = await provider.getGasPrice();
-      const amount = 0.1;
+      const amount = 0.3;
 
       await signer
         .sendTransaction({
